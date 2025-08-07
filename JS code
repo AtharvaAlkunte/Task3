@@ -1,0 +1,84 @@
+const quizData=[
+    {
+        type:'single',
+        question:"What is the capital of france",
+        options:["Paris","Berlin","London","madrid"],
+        answer:"Paris"
+    },
+    {
+        type:'multiple',
+        question:"Select all programming language: ",
+        options:["HTML","CSS","JS"],
+        answer:["JS","CSS"]
+    },
+    {
+        type:'fill',
+        question:"The sun rise in the _____",
+        answer:"east"
+    }
+];
+let currentQuestion=0;
+let score=0;
+const questionEl=document.getElementById("question");
+const optionsEl=document.getElementById("options");
+const textInput=document.getElementById("text-input");
+const submitbtn=document.getElementById("submit");
+const resultEl=document.getElementById("result");
+
+function loadQuestion(){
+ const curr=quizData[currentQuestion];
+ questionEl.textContent=curr.question;
+ optionsEl.innerHTML="";
+ resultEl.innerHTML = ``;
+
+ textInput.style.display="none";
+ textInput.value="";
+
+ if(curr.type==='single'){
+    curr.options.forEach(opt => {
+        optionsEl.innerHTML +=`
+        <label><input type="radio" name="option" value= "${opt}"> ${opt}</label>`;
+    });
+ }  if(curr.type==='multiple'){
+    curr.options.forEach(opt => {
+        optionsEl.innerHTML +=`
+        <label><input type="checkbox" name="option" value= "${opt}"> ${opt}</label>;`
+    });
+} else if(curr.type==='fill'){
+    textInput.style.display="block";
+ }
+}
+submitbtn.addEventListener("click",() =>{
+const current=quizData[currentQuestion];
+let userAnswer;
+
+if(current.type==='single'){
+    const selected=document.querySelectorAll('input[name="option"]:checked');
+    if(selected){
+        userAnswer= selected.value;
+        if(userAnswer===current.answer) score++;
+    }
+} else if (current.type === 'multiple') {
+    const selected = document.querySelectorAll('input[name="option"]:checked');
+    userAnswer = Array.from(selected).map(opt => opt.value);
+    const isCorrect = current.answer.every(ans => userAnswer.includes(ans)) &&
+                      userAnswer.length === current.answer.length;
+    if (isCorrect) score++;
+  }  else if (current.type === 'fill') {
+    userAnswer = textInput.value.trim().toLowerCase();
+    if (userAnswer === current.answer.toLowerCase()) score++;
+  }
+
+  currentQuestion++;
+  if (currentQuestion < quizData.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+});
+function showResult() {
+ resultEl.innerHTML = `<h2>Your Score: ${score} / ${quizData.length}</h2>`;
+
+}
+
+loadQuestion();
